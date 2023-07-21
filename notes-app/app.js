@@ -10,7 +10,7 @@ const yargs = require('yargs')
 // console.log(process.argv)
 yargs.command({  // for command line arguments
     command:'add',
-    describe: 'add a note',
+    describe: 'add a note',//description of command
     builder: {
         title:{
             describe: 'Note Title',
