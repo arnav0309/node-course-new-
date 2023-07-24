@@ -1,9 +1,9 @@
  //const validator = require('validator')
  const chalk = require('chalk')
-const { describe, string, argv } = require('yargs')
  //console.log(validator.isEmail('20195@iiitv'))
 //import chalk from 'chalk';
 const yargs = require('yargs')
+const notes = require('./notes.js')
 
 // const var1 = "Success"
 // console.log(chalk.red.bold(var1))
@@ -11,7 +11,7 @@ const yargs = require('yargs')
 yargs.command({  // for command line arguments
     command:'add',
     describe: 'add a note', //description of commands
-    builder: {
+    builder: { // this is object in which we can add all these option 
         title:{
             describe: 'Note Title',
             demandOption: true,
@@ -19,38 +19,56 @@ yargs.command({  // for command line arguments
         },
         body:{
             describe: 'Note-Body',
-            demandOption: true,
+            demandOption: true,// you have to provide it run command properly
             type:'string'
         }
     },
-    handler: function() {
-        console.log('Title: '+argv.title)
-        console.log('Body: '+argv.body)
+    handler(argv) {
+        // console.log('Title: '+argv.title)
+        // console.log('Body: '+argv.body)
+        notes.addNotes(argv.title,argv.body)
     }
 })
 yargs.command({
     command: 'remove',
     describe: 'remove a note',
-    handler: function(){
-        console.log("Removing a note")
+    builder:{
+        title:{
+            describe:'Note title',
+            demandOption:true,
+            type:'string'
+        }
+    },
+    handler(argv){
+        //console.log("Removing a note")
+        notes.removeNote(argv.title)
     }
 })
 yargs.command({
     command: 'list',
     describe: 'List your notes',
-    handler: function(){
-        console.group("Listing of notes")
+    handler(){
+        notes.listNotes()
     }
 })
 
 yargs.command({
     command: 'read',
     describe: 'Read a note',
-    handler: function(){
-        console.log("Reading a note")
+    builder:{
+        title:{
+            describe:'Note ttle',
+            demandOption:true,
+            type:'string'
+        }
+        
+    },
+    handler(argv){
+        notes.readNote(argv.title)
+        //console.log("Reading a note")
     }
 })
-yargs.parse()
+yargs.parse() // parsing the arguments above
 //console.log(yargs.argv)
 
 
