@@ -1,10 +1,11 @@
-const add = (a,b,callback)=>{
+const add = (callback)=>{
     setTimeout(()=>{
-        callback(a+b)
+        callback(undefined,[1,3,4])
     },2000)
 }
 
 
-add(1,4,(sum)=>{
-    console.log(sum)
+add((error,result)=>{
+    if(error) return console.log(error)
+    console.log(result)
 })

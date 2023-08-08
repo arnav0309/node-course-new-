@@ -6,7 +6,7 @@ const locationIq=(address,callback)=>{
        if(error){
           callback('Unable to connect with location service!',undefined)
        }else if(response.body.error){
-          callback(response.body.error,undefined)
+          callback('Unable to find location, try another search!',undefined)
        }else{
           callback(undefined,{
              longtitude:response.body[2].lon,
