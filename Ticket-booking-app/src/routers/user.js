@@ -58,15 +58,21 @@ router.get('/users/booking/:id',auth,async function(req,res){
   try{
     const screen =await Screen.findOne({_id:req.params.id})
     //console.log(screen)
-    const seatAvailable = (screen.seatInfo-screen.reservedSeats)
+    
+    //console.log(movie)
+    const tempval = screen.movieInfo.filter((arr)=>{return arr.name=req.query.mname})[0]
+    
+    const seatAvailable = (tempval.seatInfo-tempval.reservedSeats)
     const numberOfTicket = parseInt(req.query.tickets)
     if(seatAvailable<numberOfTicket){
       res.status(400).send({error:'This amount of tickets are not available'})
     }else{
     user.ticket=user.ticket+numberOfTicket
     user.bookingStatus=true
-    screen.reservedSeats=screen.reservedSeats+numberOfTicket
-    user.movieName=screen.name
+    tempval.reservedSeats=tempval.reservedSeats+numberOfTicket
+    user.movieName=tempval.name
+    user.mallId=req.params.id
+    user.mallName=screen.theatreName
     await screen.save()
     await user.save()
     res.send('Ticket booked successfully')
@@ -77,7 +83,7 @@ router.get('/users/booking/:id',auth,async function(req,res){
 })
 
 router.get('/users/bookingInfo',auth,async(req,res)=>{
-  if(req.user.movieName){const msg = 'There are '+req.user.ticket+' tickets are booked by '+req.user.name+' for '+req.user.movieName+' movie.'
+  if(req.user.movieName){const msg = 'There are '+req.user.ticket+' tickets are booked by '+req.user.name+' for '+req.user.movieName+' movie at'+req.user.mallName+'.'
   res.send(msg)}
   else{
     res.send(req.user.name+' has not booked any movie ticket yet')
@@ -91,12 +97,19 @@ router.get('/users',auth,async(req,res)=>{
 router.get('/users/cancelTicket',auth,async(req,res)=>{
   try{
     const user = req.user
-    const screen =await Screen.findOne({name:user.movieName})
+  
   if(user.bookingStatus){
-    screen.reservedSeats=screen.reservedSeats-user.ticket
+    console.log(user.mallId)
+    const screen =await Screen.findOne({_id:user.mallId})
+    console.log(screen)
+    const tempval = screen.movieInfo.filter((arr)=>{return arr.name=user.movieName})[0]
+    console.log(tempval)
+    tempval.reservedSeats=tempval.reservedSeats-user.ticket
     user.ticket=0
     user.bookingStatus=false
     user.movieName=""
+    user.mallId=null
+    user.mallName=""
     await user.save()
     await screen.save()
     res.send(user)

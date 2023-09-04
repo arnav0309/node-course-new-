@@ -1,20 +1,40 @@
 const mongoose = require('mongoose')
 
 let screenSchema = new mongoose.Schema({
-    name: {
+    theatreName: {
       type: String,
       required: true,
       trim: true,
       unique: true
     },
-    seatInfo: {
-      type: Number,
-      required: true
-    },
-    reservedSeats: {
-      type: Number,
-      default:0
-    }
+
+      location:{
+        type:[String],
+        requird:true
+      },
+      movieInfo:[{
+        name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      screenNumber:{
+        type:Number,
+        required:true
+      },
+      seatInfo: {
+        type: Number,
+        required: true
+      },
+      reservedSeats: {
+        type: Number,
+        default:0
+      }
+      }]
+      
+    
+
+    
   });
   
   let Screen = mongoose.model('Screen', screenSchema)

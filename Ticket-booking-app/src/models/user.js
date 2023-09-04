@@ -58,6 +58,12 @@ const userSchema = new mongoose.Schema({
     movieName:{
         type:String,
         trim:true
+    },
+    mallId:{
+        
+    },
+    mallName:{
+        type:String
     }
 })
 
@@ -66,6 +72,7 @@ userSchema.methods.toJSON = function(){
     const userObject = user.toObject()
     delete userObject.password
     delete userObject.tokens
+    //delete userObject.mallId
     return userObject
 }
 
