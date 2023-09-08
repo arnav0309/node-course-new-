@@ -1,14 +1,40 @@
 const express = require('express')
 const router = new express.Router()
+const Location = require('../models/location')
 const Screen = require('../models/screen')
+const { default: mongoose } = require('mongoose')
 
 
 //API to accept details of movie screen
 router.post('/screens', async (req, res) => {
 
     try {
-      const screen = new Screen(req.body);
-      await screen.save();
+        const locationInfos= await Location.findByLocation(req.body.location)
+        if(locationInfos===false){
+            const scr = new Screen({
+                _id:new mongoose.Types.ObjectId(),
+                theatreName:req.body.theatreName,
+                movieInfo:req.body.movieInfo
+              })
+              await scr.save();
+            const loc = new Location({
+                location:req.body.location,
+                screenInfo:scr._id
+              });
+              await loc.save();
+          
+        }else{
+            const scr = new Screen({
+                _id:new mongoose.Types.ObjectId(),
+                theatreName:req.body.theatreName,
+                movieInfo:req.body.movieInfo
+              })
+              await scr.save();
+            locationInfos.screenInfo.push(scr._id)
+            await locationInfos.save()
+        }
+        
+      
       res.send();
     } catch (e) {
         res.status(400).send(e);
@@ -42,7 +68,7 @@ router.post('/screens/:name',async(req,res)=>{
     try{
         
         const screen =await Screen.findOne({theatreName:temp})
-        console.log(screen)
+       // console.log(screen)
         //const movies = screen.
         res.send(screen)
     }catch(e){

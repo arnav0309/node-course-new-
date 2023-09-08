@@ -51,7 +51,7 @@ router.post('/users/logoutAll',auth,async(req,res)=>{
   }
 })
 
-router.get('/users/booking/:id',auth,async function(req,res){
+router.post('/users/booking/:id',auth,async function(req,res){
  // const _id = req.params.id
   //console.log(_id)
   const user = req.user
@@ -60,10 +60,10 @@ router.get('/users/booking/:id',auth,async function(req,res){
     //console.log(screen)
     
     //console.log(movie)
-    const tempval = screen.movieInfo.filter((arr)=>{return arr.name=req.query.mname})[0]
+    const tempval = screen.movieInfo.filter((arr)=>{return arr.name=req.body.mname})[0]
     
     const seatAvailable = (tempval.seatInfo-tempval.reservedSeats)
-    const numberOfTicket = parseInt(req.query.tickets)
+    const numberOfTicket = parseInt(req.body.tickets)
     if(seatAvailable<numberOfTicket){
       res.status(400).send({error:'This amount of tickets are not available'})
     }else{
@@ -83,7 +83,7 @@ router.get('/users/booking/:id',auth,async function(req,res){
 })
 
 router.get('/users/bookingInfo',auth,async(req,res)=>{
-  if(req.user.movieName){const msg = 'There are '+req.user.ticket+' tickets are booked by '+req.user.name+' for '+req.user.movieName+' movie at'+req.user.mallName+'.'
+  if(req.user.movieName){const msg = 'There are '+req.user.ticket+' tickets are booked by '+req.user.name+' for '+req.user.movieName+' movie at '+req.user.mallName+'.'
   res.send(msg)}
   else{
     res.send(req.user.name+' has not booked any movie ticket yet')

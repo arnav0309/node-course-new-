@@ -4,39 +4,27 @@ let screenSchema = new mongoose.Schema({
     theatreName: {
       type: String,
       required: true,
-      trim: true,
-      unique: true
+      trim: true
     },
-
-      location:{
-        type:[String],
-        requird:true
-      },
-      movieInfo:[{
-        name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-      screenNumber:{
-        type:Number,
-        required:true
-      },
-      seatInfo: {
-        type: Number,
-        required: true
-      },
-      reservedSeats: {
-        type: Number,
-        default:0
-      }
-      }]
-      
-    
-
-    
-  });
-  
-  let Screen = mongoose.model('Screen', screenSchema)
-  
-  module.exports = Screen
+    movieInfo:[{
+      name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    screenNumber:{
+      type:Number,
+      required:true
+    },
+    seatInfo: {
+      type: Number,
+      required: true
+    },
+    reservedSeats: {
+      type: Number,
+      default:0
+    }
+    }]   
+  }); 
+ let Screen = mongoose.model('Screen', screenSchema) 
+ module.exports = Screen
