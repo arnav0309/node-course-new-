@@ -7,12 +7,13 @@ const screen = require('./models/screen')
 const app=express()
 const userRouter = require('./routers/user')
 const screenRouter = require('./routers/screen')
+// const seatRouter = require('./routers/booking')
 const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(userRouter)
 app.use(screenRouter)
-
+//app.use(seatRouter)
 
 
 

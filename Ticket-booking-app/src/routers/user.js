@@ -3,7 +3,8 @@ const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 const Screen = require('../models/screen')
-
+const Booking = require('../models/booking')
+const Payment = require('../models/payment')
 
 router.post('/users', async (req, res) => {
   const user = new User(req.body)
@@ -60,31 +61,72 @@ router.post('/users/booking/:id',auth,async function(req,res){
     //console.log(screen)
     
     //console.log(movie)
-    const tempval = screen.movieInfo.filter((arr)=>{return arr.name=req.body.mname})[0]
+    const tempval = screen.movieInfo.find((arr)=>{return arr.name===req.body.mname})
+    //console.log(screen)
+    let items = tempval.seatInfo.filter(item=>item.status.indexOf('available')!==-1)
+   // console.log(screen)
     
-    const seatAvailable = (tempval.seatInfo-tempval.reservedSeats)
-    const numberOfTicket = parseInt(req.body.tickets)
-    if(seatAvailable<numberOfTicket){
-      res.status(400).send({error:'This amount of tickets are not available'})
-    }else{
-    user.ticket=user.ticket+numberOfTicket
-    user.bookingStatus=true
-    tempval.reservedSeats=tempval.reservedSeats+numberOfTicket
-    user.movieName=tempval.name
-    user.mallId=req.params.id
-    user.mallName=screen.theatreName
-    await screen.save()
-    await user.save()
-    res.send('Ticket booked successfully')
+    let numberOfTicket = parseInt(req.body.tickets)
+    if(items.length>=numberOfTicket){
+      let val=0
+      let tostore=[]
+      while(val<numberOfTicket){
+        tostore.push(items[val].seatNumber)
+        items[val].status='booked'
+        val++
+      }
+     // console.log(screen)
+      await screen.save()
+      let totalmoney = numberOfTicket*tempval.ticketPrice
+      let booking1=new Booking({
+        booking_id:Date.now(),
+        seatInfo:tostore
+      })
+      await booking1.save()
+      user.bookingInfo.push(booking1._id)
+      let payment1=new Payment({
+        payment_id:(Date.now()*53),
+        paidStatus:'Paid',
+        totalPaid:totalmoney
+      })
+      await payment1.save()
+      user.paymentInfo.push(payment1._id)
+      const obj = {Location:screen.theatreLocation,movieName:tempval.name,mallName:screen.theatreName,bookedSeats:tostore}
+      user.bookedMovieInfo.push(obj)
+      //user.mallName.push(screen.theatreName)
+      await user.save()
+      
+      //console.log('sucess')
     }
+    else{ //console.log('not')
+    res.send('Not Enough Seat Available')
+  }
+    //const seatAvailable = (tempval.seatInfo-tempval.reservedSeats)
+    
+    // if(seatAvailable<numberOfTicket){
+    //   res.status(400).send({error:'This amount of tickets are not available'})
+    // }else{
+    // user.ticket=user.ticket+numberOfTicket
+    // user.bookingStatus=true
+    // tempval.reservedSeats=tempval.reservedSeats+numberOfTicket
+    // user.movieName=tempval.name
+    // user.mallId=req.params.id
+    // user.mallName=screen.theatreName
+    // await screen.save()
+    // await user.save()
+
+
+    res.send('Ticket booked successfully')
+    //}
   }catch(e){
     res.status(400).send()
   }
 })
 
 router.get('/users/bookingInfo',auth,async(req,res)=>{
-  if(req.user.movieName){const msg = 'There are '+req.user.ticket+' tickets are booked by '+req.user.name+' for '+req.user.movieName+' movie at '+req.user.mallName+'.'
-  res.send(msg)}
+  if(req.user.bookedMovieInfo.length!==0){
+
+  res.send(req.user.bookedMovieInfo)}
   else{
     res.send(req.user.name+' has not booked any movie ticket yet')
   }

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
@@ -47,24 +48,21 @@ const userSchema = new mongoose.Schema({
             required:true
         }
     }],
-    ticket:{
-        type:Number,
-        default:0
-    },
-    bookingStatus:{
-        type:Boolean,
-        default:false
-    },
-    movieName:{
-        type:String,
-        trim:true
-    },
+    // ticket:{
+    //     type:Number,
+    //     default:0
+    // },
+    // bookingStatus:{
+    //     type:Boolean,
+    //     default:false
+    // },
+    bookingInfo:[{type:mongoose.Schema.Types.ObjectId,ref:'Booking'}],
+    paymentInfo:[{type:mongoose.Schema.Types.ObjectId,ref:'Payment'}],
+    bookedMovieInfo:[],
     mallId:{
         
-    },
-    mallName:{
-        type:String
     }
+    
 })
 
 userSchema.methods.toJSON = function(){
@@ -78,7 +76,7 @@ userSchema.methods.toJSON = function(){
 
 userSchema.methods.generateAuthToken = async function(){
     const user = this
-    const token = jwt.sign({_id:user._id.toString()},'anandticketbooking')
+    const token = jwt.sign({_id:user._id.toString()},process.env.TOKEN_VERIFICATION_CODE)
     user.tokens=user.tokens.concat({token})
     await user.save()
     return token

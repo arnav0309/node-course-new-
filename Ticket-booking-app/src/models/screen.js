@@ -6,6 +6,9 @@ let screenSchema = new mongoose.Schema({
       required: true,
       trim: true
     },
+    theatreLocation:{
+      type:String
+    },
     movieInfo:[{
       name: {
       type: String,
@@ -16,13 +19,21 @@ let screenSchema = new mongoose.Schema({
       type:Number,
       required:true
     },
-    seatInfo: {
+    seatInfo: [{
+      seatNumber:{
+          type:String,
+          required:true,
+          //unique:true
+      },
+      status:{
+          type:String,
+          enum:['available','booked','reserved','unavailable'],
+          default:'available'
+      }
+  }],
+    ticketPrice: {
       type: Number,
-      required: true
-    },
-    reservedSeats: {
-      type: Number,
-      default:0
+     required:true
     }
     }]   
   }); 
